@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Alpine Cricket Soundboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f1f1;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      color: #006400;
+    }
+    section {
+      margin-top: 40px;
+    }
+    .sound-button {
+      margin: 10px;
+      padding: 15px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .sound-button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>🏏 Alpine Cricket Soundboard</h1>
+
+  <section>
+    <h2>Batting Sounds</h2>
+    <button class="sound-button" onclick="playSound('1 run.mp3')">1 Run</button>
+    <button class="sound-button" onclick="playSound('2 runs.mp3')">2 Runs</button>
+    <button class="sound-button" onclick="playSound('4 runs.mp3')">4 Runs</button>
+  </section>
+
+  <section>
+    <h2>Bowling Sounds</h2>
+    <!-- Add buttons here after uploading more files -->
+    <p>(Coming Soon...)</p>
+  </section>
+
+  <audio id="player" src=""></audio>
+
+  <script>
+    function playSound(file) {
+      const player = document.getElementById('player');
+      player.src = file;
+      player.play();
+    }
+  </script>
+</body>
+</html>
