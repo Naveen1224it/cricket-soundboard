@@ -5,196 +5,141 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Alpine Cricket Soundboard</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(to top, #7ec850, #87cefa);
+      background: #f1f1f1;
+      text-align: center;
+      padding: 20px;
       overflow-x: hidden;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to top, #7ec850, #87cefa);
-      z-index: -3;
-      animation: backgroundMove 15s ease-in-out infinite;
-    }
-
-    @keyframes backgroundMove {
-      0% { background-position: 0 0; }
-      50% { background-position: 100% 100%; }
-      100% { background-position: 0 0; }
-    }
-
-    .cloud {
-      position: absolute;
-      top: 40px;
-      background: #fff;
-      border-radius: 50%;
-      opacity: 0.6;
-      animation: floatCloud 60s linear infinite;
-    }
-
-    .cloud:before, .cloud:after {
-      content: '';
-      position: absolute;
-      background: #fff;
-      border-radius: 50%;
-    }
-
-    .cloud1 {
-      width: 120px;
-      height: 60px;
-      left: -150px;
-    }
-
-    .cloud1:before {
-      width: 60px;
-      height: 60px;
-      top: -20px;
-      left: 40px;
-    }
-
-    .cloud1:after {
-      width: 50px;
-      height: 50px;
-      top: 10px;
-      left: 80px;
-    }
-
-    @keyframes floatCloud {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(2000px); }
-    }
-
-    .container {
-      padding: 20px;
-      text-align: center;
-      position: relative;
-      z-index: 1;
-    }
-
     h1 {
-      color: #ffffff;
-      text-shadow: 2px 2px 4px #000;
-      font-size: 28px;
-    }
-
-    h2 {
-      color: #003300;
-      margin-top: 30px;
+      color: #006400;
+      font-size: 2em;
     }
 
     section {
-      margin-top: 20px;
-      background-color: rgba(255, 255, 255, 0.9);
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 30px;
-      display: inline-block;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      width: 95%;
-      max-width: 600px;
+      margin-top: 30px;
     }
 
     .sound-button {
       margin: 10px;
-      padding: 15px 20px;
+      padding: 12px 24px;
       font-size: 16px;
       border: none;
       border-radius: 10px;
       background-color: #4CAF50;
       color: white;
       cursor: pointer;
-      transition: background-color 0.2s ease, transform 0.2s ease;
+      transition: background-color 10s ease;
       position: relative;
     }
 
     .sound-button:hover {
       background-color: #45a049;
-      transform: scale(1.05);
     }
 
     .sound-button.active {
       background-color: #ff9800 !important;
-      box-shadow: 0 0 20px #ffc107;
     }
 
     .sparkle {
       position: absolute;
-      width: 6px;
-      height: 6px;
+      width: 8px;
+      height: 8px;
       background: gold;
       border-radius: 50%;
       pointer-events: none;
-      animation: sparkleAnim 0.8s ease-out forwards;
+      animation: sparkleAnim 10s ease-out forwards;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
     }
 
     @keyframes sparkleAnim {
-      0% {
-        transform: scale(1) translate(0, 0);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(0.5) translate(var(--x), var(--y));
-        opacity: 0;
-      }
+      0% { opacity: 1; transform: translate(0, 0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(0); }
+    }
+
+    .sparkle-global {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      background: gold;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1000;
+      animation: sparkleAnim 10s ease-out forwards;
+    }
+
+    .shake {
+      animation: shakeAnim 10s ease-in-out;
+    }
+
+    @keyframes shakeAnim {
+      0%, 100% { transform: translate(0, 0); }
+      20% { transform: translate(-10px, 0); }
+      40% { transform: translate(10px, 0); }
+      60% { transform: translate(-10px, 0); }
+      80% { transform: translate(10px, 0); }
+    }
+
+    .crack-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 999;
+      pointer-events: none;
+      animation: fadeOut 10s ease-out forwards;
+    }
+
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
     }
 
     @media (max-width: 600px) {
       .sound-button {
-        width: 100%;
-        max-width: 90%;
-        font-size: 18px;
+        width: 90%;
+        font-size: 16px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="cloud cloud1"></div>
+  <h1>🏏 Alpine Cricket Soundboard</h1>
 
-  <div class="container">
-    <h1>🏏 Alpine Cricket Soundboard</h1>
+  <section>
+    <h2>Batting Sounds</h2>
+    <button class="sound-button" onclick="handleClick(this, '1 run.mp3')">1 Run</button>
+    <button class="sound-button" onclick="handleClick(this, '2 runs.mp3')">2 Runs</button>
+    <button class="sound-button" onclick="handleClick(this, '4 runs.mp3')">4 Runs</button>
+    <button class="sound-button" onclick="handleClick(this, '6 runs.mp3')">6 Runs</button>
+    <button class="sound-button" onclick="handleClick(this, 'Cheers to batsman on last overs.mp3')">Last Over Cheers</button>
+  </section>
 
-    <section>
-      <h2>Batting Sounds</h2>
-      <button class="sound-button" onclick="playSound(this, '1 run.mp3')">1 Run</button>
-      <button class="sound-button" onclick="playSound(this, '2 runs.mp3')">2 Runs</button>
-      <button class="sound-button" onclick="playSound(this, '4 runs.mp3')">4 Runs</button>
-      <button class="sound-button" onclick="playSound(this, '6 runs.mp3')">6 Runs</button>
-      <button class="sound-button" onclick="playSound(this, 'Cheers to batsman on last overs.mp3')">Last Over Cheers</button>
-    </section>
+  <section>
+    <h2>Bowling Sounds</h2>
+    <button class="sound-button" onclick="handleClick(this, 'Good Ball.mp3')">Good Ball</button>
+    <button class="sound-button" onclick="handleClick(this, 'Nice Ball.mp3')">Nice Ball</button>
+    <button class="sound-button" onclick="handleClick(this, 'Wicket.mp3')">Wicket</button>
+    <button class="sound-button" onclick="handleClick(this, 'Wicket-2.mp3')">Wicket-2</button>
+  </section>
 
-    <section>
-      <h2>Bowling Sounds</h2>
-      <button class="sound-button" onclick="playSound(this, 'Good Ball.mp3')">Good Ball</button>
-      <button class="sound-button" onclick="playSound(this, 'Nice Ball.mp3')">Nice Ball</button>
-      <button class="sound-button" onclick="playSound(this, 'Wicket.mp3')">Wicket</button>
-      <button class="sound-button" onclick="playSound(this, 'Wicket-2.mp3')">Wicket-2</button>
-    </section>
-
-    <section>
-      <h2>Extras</h2>
-      <button class="sound-button" onclick="playSound(this, 'No Ball.mp3')">No Ball</button>
-      <button class="sound-button" onclick="playSound(this, 'Wide Ball.mp3')">Wide Ball</button>
-      <button class="sound-button" onclick="playSound(this, 'Over Change.mp3')">Over Change</button>
-      <button class="sound-button" onclick="playSound(this, 'whistle.mp3')">Whistle</button>
-      <button class="sound-button" onclick="playSound(this, 'whistle-102013.mp3')">Whistle-1</button>
-    </section>
-  </div>
+  <section>
+    <h2>Extras</h2>
+    <button class="sound-button" onclick="handleClick(this, 'No Ball.mp3')">No Ball</button>
+    <button class="sound-button" onclick="handleClick(this, 'Wide Ball.mp3')">Wide Ball</button>
+    <button class="sound-button" onclick="handleClick(this, 'Over Change.mp3')">Over Change</button>
+    <button class="sound-button" onclick="handleClick(this, 'whistle.mp3')">Whistle</button>
+    <button class="sound-button" onclick="handleClick(this, 'whistle-102013.mp3')">Whistle-1</button>
+  </section>
 
   <audio id="player" src=""></audio>
 
   <script>
-    function playSound(button, file) {
+    function handleClick(button, file) {
       const player = document.getElementById('player');
       player.src = file;
       player.play();
@@ -202,17 +147,51 @@
       button.classList.add("active");
       setTimeout(() => button.classList.remove("active"), 4000);
 
-      // Add sparkles
-      for (let i = 0; i < 12; i++) {
+      // Sparkles on button
+      for (let i = 0; i < 10; i++) {
         const sparkle = document.createElement("div");
         sparkle.className = "sparkle";
-        sparkle.style.left = "50%";
-        sparkle.style.top = "50%";
         sparkle.style.setProperty('--x', `${Math.random() * 200 - 100}px`);
         sparkle.style.setProperty('--y', `${Math.random() * 200 - 100}px`);
         button.appendChild(sparkle);
         setTimeout(() => sparkle.remove(), 800);
       }
+
+      // Full-page sparkles for 4s/6s
+      if (file.toLowerCase().includes("4 runs") || file.toLowerCase().includes("6 runs")) {
+        sparkleBurst();
+      }
+
+      // Shake & crack for wicket
+      if (file.toLowerCase().includes("wicket")) {
+        triggerShake();
+      }
+    }
+
+    function sparkleBurst() {
+      for (let i = 0; i < 800; i++) {
+        const sparkle = document.createElement("div");
+        sparkle.className = "sparkle-global";
+        sparkle.style.left = `${Math.random() * 100}vw`;
+        sparkle.style.top = `${Math.random() * 100}vh`;
+        sparkle.style.setProperty('--x', `${Math.random() * 200 - 100}px`);
+        sparkle.style.setProperty('--y', `${Math.random() * 200 - 100}px`);
+        document.body.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 8000);
+      }
+    }
+
+    function triggerShake() {
+      document.body.classList.add("shake");
+
+      const crack = document.createElement("div");
+      crack.className = "crack-overlay";
+      document.body.appendChild(crack);
+
+      setTimeout(() => {
+        document.body.classList.remove("shake");
+        crack.remove();
+      }, 1000);
     }
   </script>
 </body>
