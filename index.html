@@ -7,15 +7,18 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f1f1f1;
+      background: url('https://img.freepik.com/free-vector/wet-asphalt-road-with-mark-line-covered-smoke_107791-29669.jpg') no-repeat center center fixed;
+      background-size: cover;
       text-align: center;
       padding: 20px;
       overflow-x: hidden;
+      color: #fff;
     }
 
     h1 {
-      color: #006400;
+      color: #ffeb3b;
       font-size: 2em;
+      text-shadow: 2px 2px #000;
     }
 
     section {
@@ -28,32 +31,43 @@
       font-size: 16px;
       border: none;
       border-radius: 10px;
-      background-color: #4CAF50;
+      background-color: rgba(76, 175, 80, 0.8);
       color: white;
       cursor: pointer;
-      transition: background-color 10s ease;
+      transition: background-color 0.3s ease;
       position: relative;
     }
 
     .sound-button:hover {
-      background-color: #45a049;
+      background-color: rgba(69, 160, 73, 0.8);
     }
 
     .sound-button.active {
-      background-color: #ff9800 !important;
+      background-color: rgba(255, 152, 0, 0.8) !important;
     }
 
     .sparkle {
       position: absolute;
       width: 8px;
       height: 8px;
-      background: gold;
+      background: red;
       border-radius: 50%;
       pointer-events: none;
-      animation: sparkleAnim 10s ease-out forwards;
+      animation: sparkleAnim 8s ease-out forwards;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
+    }
+
+    .sparkle-global {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      background: red;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1000;
+      animation: sparkleAnim 8s ease-out forwards;
     }
 
     @keyframes sparkleAnim {
@@ -61,19 +75,8 @@
       100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(0); }
     }
 
-    .sparkle-global {
-      position: fixed;
-      width: 8px;
-      height: 8px;
-      background: gold;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 1000;
-      animation: sparkleAnim 10s ease-out forwards;
-    }
-
     .shake {
-      animation: shakeAnim 10s ease-in-out;
+      animation: shakeAnim 0.5s ease-in-out;
     }
 
     @keyframes shakeAnim {
@@ -91,12 +94,27 @@
       height: 100%;
       z-index: 999;
       pointer-events: none;
-      animation: fadeOut 10s ease-out forwards;
+      animation: fadeOut 1s ease-out forwards;
+      background: url('https://i.imgur.com/IaUrttj.png') center center no-repeat;
+      background-size: cover;
+      opacity: 0.7;
     }
 
     @keyframes fadeOut {
-      0% { opacity: 1; }
+      0% { opacity: 0.7; }
       100% { opacity: 0; }
+    }
+
+    #four-gif, #six-gif, #wicket-gif {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2000;
+      width: 300px;
+      height: auto;
+      pointer-events: none;
     }
 
     @media (max-width: 600px) {
@@ -136,6 +154,9 @@
     <button class="sound-button" onclick="handleClick(this, 'whistle-102013.mp3')">Whistle-1</button>
   </section>
 
+  <img id="four-gif" src="https://i.gifer.com/4l3d.gif" alt="4 runs animation">
+  <img id="six-gif" src="https://i.gifer.com/33Hs.gif" alt="6 runs animation">
+  <img id="wicket-gif" src="https://media1.tenor.com/m/LxgSnOOKnjEAAAAd/out-umpire.gif" alt="wicket animation">
   <audio id="player" src=""></audio>
 
   <script>
@@ -147,31 +168,36 @@
       button.classList.add("active");
       setTimeout(() => button.classList.remove("active"), 4000);
 
-      // Sparkles on button
+      const colors = ['red', 'yellow', 'blue', 'lime', 'orange', 'pink', 'cyan', 'purple', 'white'];
+
       for (let i = 0; i < 10; i++) {
         const sparkle = document.createElement("div");
         sparkle.className = "sparkle";
+        sparkle.style.background = colors[Math.floor(Math.random() * colors.length)];
         sparkle.style.setProperty('--x', `${Math.random() * 200 - 100}px`);
         sparkle.style.setProperty('--y', `${Math.random() * 200 - 100}px`);
         button.appendChild(sparkle);
-        setTimeout(() => sparkle.remove(), 800);
+        setTimeout(() => sparkle.remove(), 8000);
       }
 
-      // Full-page sparkles for 4s/6s
-      if (file.toLowerCase().includes("4 runs") || file.toLowerCase().includes("6 runs")) {
+      if (file.toLowerCase().includes("4 runs")) {
         sparkleBurst();
-      }
-
-      // Shake & crack for wicket
-      if (file.toLowerCase().includes("wicket")) {
+        showGif("four-gif");
+      } else if (file.toLowerCase().includes("6 runs")) {
+        sparkleBurst();
+        showGif("six-gif");
+      } else if (file.toLowerCase().includes("wicket")) {
+        showGif("wicket-gif");
         triggerShake();
       }
     }
 
     function sparkleBurst() {
-      for (let i = 0; i < 800; i++) {
+      const colors = ['red', 'yellow', 'blue', 'lime', 'orange', 'pink', 'cyan', 'purple', 'white'];
+      for (let i = 0; i < 300; i++) {
         const sparkle = document.createElement("div");
         sparkle.className = "sparkle-global";
+        sparkle.style.background = colors[Math.floor(Math.random() * colors.length)];
         sparkle.style.left = `${Math.random() * 100}vw`;
         sparkle.style.top = `${Math.random() * 100}vh`;
         sparkle.style.setProperty('--x', `${Math.random() * 200 - 100}px`);
@@ -181,13 +207,23 @@
       }
     }
 
+    function showGif(gifId) {
+      document.getElementById("four-gif").style.display = "none";
+      document.getElementById("six-gif").style.display = "none";
+      document.getElementById("wicket-gif").style.display = "none";
+
+      const gif = document.getElementById(gifId);
+      if (gif) {
+        gif.style.display = "block";
+        setTimeout(() => gif.style.display = "none", 3000);
+      }
+    }
+
     function triggerShake() {
       document.body.classList.add("shake");
-
       const crack = document.createElement("div");
       crack.className = "crack-overlay";
       document.body.appendChild(crack);
-
       setTimeout(() => {
         document.body.classList.remove("shake");
         crack.remove();
