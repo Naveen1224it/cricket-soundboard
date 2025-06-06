@@ -5,14 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Alpine Cricket Soundboard</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      background: linear-gradient(to top, #7ec850, #87cefa);
       overflow-x: hidden;
     }
 
-    /* Background animation */
     body::before {
       content: "";
       position: fixed;
@@ -30,7 +34,6 @@
       100% { background-position: 0 0; }
     }
 
-    /* Animated clouds */
     .cloud {
       position: absolute;
       top: 40px;
@@ -73,7 +76,7 @@
     }
 
     .container {
-      padding: 30px;
+      padding: 20px;
       text-align: center;
       position: relative;
       z-index: 1;
@@ -82,36 +85,76 @@
     h1 {
       color: #ffffff;
       text-shadow: 2px 2px 4px #000;
+      font-size: 28px;
     }
 
     h2 {
       color: #003300;
+      margin-top: 30px;
     }
 
     section {
-      margin-top: 40px;
-      background-color: rgba(255, 255, 255, 0.85);
+      margin-top: 20px;
+      background-color: rgba(255, 255, 255, 0.9);
       border-radius: 10px;
       padding: 20px;
       margin-bottom: 30px;
       display: inline-block;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      width: 95%;
+      max-width: 600px;
     }
 
     .sound-button {
       margin: 10px;
-      padding: 15px 30px;
-      font-size: 18px;
+      padding: 15px 20px;
+      font-size: 16px;
       border: none;
       border-radius: 10px;
       background-color: #4CAF50;
       color: white;
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+      position: relative;
     }
 
     .sound-button:hover {
       background-color: #45a049;
+      transform: scale(1.05);
+    }
+
+    .sound-button.active {
+      background-color: #ff9800 !important;
+      box-shadow: 0 0 20px #ffc107;
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: gold;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: sparkleAnim 0.8s ease-out forwards;
+    }
+
+    @keyframes sparkleAnim {
+      0% {
+        transform: scale(1) translate(0, 0);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(0.5) translate(var(--x), var(--y));
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .sound-button {
+        width: 100%;
+        max-width: 90%;
+        font-size: 18px;
+      }
     }
   </style>
 </head>
@@ -123,38 +166,53 @@
 
     <section>
       <h2>Batting Sounds</h2>
-      <button class="sound-button" onclick="playSound('1 run.mp3')">1 Run</button>
-      <button class="sound-button" onclick="playSound('2 runs.mp3')">2 Runs</button>
-      <button class="sound-button" onclick="playSound('4 runs.mp3')">4 Runs</button>
-      <button class="sound-button" onclick="playSound('6 runs.mp3')">6 Runs</button>
-      <button class="sound-button" onclick="playSound('Cheers to batsman on last overs.mp3')">Last Over Cheers</button>
+      <button class="sound-button" onclick="playSound(this, '1 run.mp3')">1 Run</button>
+      <button class="sound-button" onclick="playSound(this, '2 runs.mp3')">2 Runs</button>
+      <button class="sound-button" onclick="playSound(this, '4 runs.mp3')">4 Runs</button>
+      <button class="sound-button" onclick="playSound(this, '6 runs.mp3')">6 Runs</button>
+      <button class="sound-button" onclick="playSound(this, 'Cheers to batsman on last overs.mp3')">Last Over Cheers</button>
     </section>
 
     <section>
       <h2>Bowling Sounds</h2>
-      <button class="sound-button" onclick="playSound('Good Ball.mp3')">Good Ball</button>
-      <button class="sound-button" onclick="playSound('Nice Ball.mp3')">Nice Ball</button>
-      <button class="sound-button" onclick="playSound('Wicket.mp3')">Wicket</button>
-      <button class="sound-button" onclick="playSound('Wicket-2.mp3')">Wicket-2</button>
+      <button class="sound-button" onclick="playSound(this, 'Good Ball.mp3')">Good Ball</button>
+      <button class="sound-button" onclick="playSound(this, 'Nice Ball.mp3')">Nice Ball</button>
+      <button class="sound-button" onclick="playSound(this, 'Wicket.mp3')">Wicket</button>
+      <button class="sound-button" onclick="playSound(this, 'Wicket-2.mp3')">Wicket-2</button>
     </section>
 
     <section>
       <h2>Extras</h2>
-      <button class="sound-button" onclick="playSound('No Ball.mp3')">No Ball</button>
-      <button class="sound-button" onclick="playSound('Wide Ball.mp3')">Wide Ball</button>
-      <button class="sound-button" onclick="playSound('Over Change.mp3')">Over Change</button>
-      <button class="sound-button" onclick="playSound('whistle.mp3')">Whistle</button>
-      <button class="sound-button" onclick="playSound('whistle-102013.mp3')">Whistle-1</button>
+      <button class="sound-button" onclick="playSound(this, 'No Ball.mp3')">No Ball</button>
+      <button class="sound-button" onclick="playSound(this, 'Wide Ball.mp3')">Wide Ball</button>
+      <button class="sound-button" onclick="playSound(this, 'Over Change.mp3')">Over Change</button>
+      <button class="sound-button" onclick="playSound(this, 'whistle.mp3')">Whistle</button>
+      <button class="sound-button" onclick="playSound(this, 'whistle-102013.mp3')">Whistle-1</button>
     </section>
   </div>
 
   <audio id="player" src=""></audio>
 
   <script>
-    function playSound(file) {
+    function playSound(button, file) {
       const player = document.getElementById('player');
       player.src = file;
       player.play();
+
+      button.classList.add("active");
+      setTimeout(() => button.classList.remove("active"), 4000);
+
+      // Add sparkles
+      for (let i = 0; i < 12; i++) {
+        const sparkle = document.createElement("div");
+        sparkle.className = "sparkle";
+        sparkle.style.left = "50%";
+        sparkle.style.top = "50%";
+        sparkle.style.setProperty('--x', `${Math.random() * 200 - 100}px`);
+        sparkle.style.setProperty('--y', `${Math.random() * 200 - 100}px`);
+        button.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 800);
+      }
     }
   </script>
 </body>
