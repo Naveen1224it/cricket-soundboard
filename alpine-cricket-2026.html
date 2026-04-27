@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Alpine Cricket League 2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0a1628;
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #1a6b3c 0%, #0a3d1f 50%, #1a3a6b 100%);
+      padding: 18px 16px 14px;
+      text-align: center;
+      border-bottom: 3px solid #f5a623;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .header h1 {
+      font-size: clamp(1.1rem, 5vw, 1.8rem);
+      font-weight: 800;
+      color: #f5a623;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      letter-spacing: 1px;
+    }
+
+    .header p {
+      font-size: 0.75rem;
+      color: #a8d8b0;
+      margin-top: 4px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ── Now Playing Bar ── */
+    .now-playing {
+      background: rgba(245,166,35,0.12);
+      border-bottom: 1px solid rgba(245,166,35,0.3);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 40px;
+    }
+
+    .now-playing .label {
+      font-size: 0.7rem;
+      color: #f5a623;
+      font-weight: 700;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .now-playing .track {
+      font-size: 0.85rem;
+      color: #fff;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pulse-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #f5a623;
+      display: none;
+      animation: pulse 1s infinite;
+      flex-shrink: 0;
+    }
+
+    .pulse-dot.active { display: block; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* ── Tab Navigation ── */
+    .tabs {
+      display: flex;
+      background: #0d1f3c;
+      border-bottom: 2px solid #1e3a5f;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .tabs::-webkit-scrollbar { display: none; }
+
+    .tab {
+      flex: 1;
+      min-width: 80px;
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #6b8cba;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tab.active {
+      color: #f5a623;
+      border-bottom-color: #f5a623;
+      background: rgba(245,166,35,0.08);
+    }
+
+    .tab .tab-icon { font-size: 1.2rem; display: block; margin-bottom: 2px; }
+
+    /* ── Content Panels ── */
+    .panel { display: none; padding: 16px; }
+    .panel.active { display: block; }
+
+    /* ── Sound Grid ── */
+    .sound-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    @media (min-width: 480px) {
+      .sound-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (min-width: 768px) {
+      .sound-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    /* ── Sound Button ── */
+    .sound-btn {
+      position: relative;
+      overflow: hidden;
+      border: none;
+      border-radius: 16px;
+      padding: 18px 10px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      transition: transform 0.15s, box-shadow 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      min-height: 90px;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .sound-btn:active { transform: scale(0.94); }
+
+    .sound-btn .btn-icon { font-size: 1.8rem; line-height: 1; }
+    .sound-btn .btn-label { line-height: 1.2; }
+
+    /* Category colors */
+    .btn-batting  { background: linear-gradient(135deg, #1a6b3c, #0f4526); box-shadow: 0 4px 15px rgba(26,107,60,0.4); }
+    .btn-bowling  { background: linear-gradient(135deg, #1a3a6b, #0d1f3c); box-shadow: 0 4px 15px rgba(26,58,107,0.4); }
+    .btn-extras   { background: linear-gradient(135deg, #6b3a1a, #3d1f0a); box-shadow: 0 4px 15px rgba(107,58,26,0.4); }
+    .btn-bgm      { background: linear-gradient(135deg, #6b1a6b, #3d0a3d); box-shadow: 0 4px 15px rgba(107,26,107,0.4); }
+
+    .sound-btn.playing {
+      animation: btnPulse 0.6s ease-out;
+      filter: brightness(1.3);
+    }
+
+    @keyframes btnPulse {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    /* ── Stop Button ── */
+    .stop-btn {
+      display: block;
+      width: 100%;
+      margin-top: 16px;
+      padding: 14px;
+      background: linear-gradient(135deg, #c0392b, #922b21);
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 15px rgba(192,57,43,0.4);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .stop-btn:active { transform: scale(0.97); }
+
+    /* ── GIF Overlay ── */
+    .gif-overlay {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2000;
+      width: min(320px, 85vw);
+      border-radius: 16px;
+      pointer-events: none;
+      box-shadow: 0 0 40px rgba(245,166,35,0.6);
+    }
+
+    /* ── Confetti Canvas ── */
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1500;
+    }
+
+    /* ── Shake ── */
+    .shake { animation: shakeAnim 0.5s ease-in-out; }
+
+    @keyframes shakeAnim {
+      0%, 100% { transform: translateX(0); }
+      20%       { transform: translateX(-10px); }
+      40%       { transform: translateX(10px); }
+      60%       { transform: translateX(-8px); }
+      80%       { transform: translateX(8px); }
+    }
+
+    /* ── Crack Overlay ── */
+    .crack-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      pointer-events: none;
+      background: url('https://i.imgur.com/IaUrttj.png') center/cover no-repeat;
+      animation: fadeOut 1s ease-out forwards;
+      opacity: 0.7;
+    }
+
+    @keyframes fadeOut {
+      0%   { opacity: 0.7; }
+      100% { opacity: 0; }
+    }
+
+    /* ── Section Label ── */
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #6b8cba;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <h1>🏏 Alpine Cricket League 2026</h1>
+    <p>Official Soundboard</p>
+  </div>
+
+  <!-- Now Playing -->
+  <div class="now-playing">
+    <div class="pulse-dot" id="pulse-dot"></div>
+    <span class="label">Now Playing:</span>
+    <span class="track" id="now-playing-text">—</span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('batting', this)">
+      <span class="tab-icon">🏏</span>Batting
+    </div>
+    <div class="tab" onclick="switchTab('bowling', this)">
+      <span class="tab-icon">🎯</span>Bowling
+    </div>
+    <div class="tab" onclick="switchTab('extras', this)">
+      <span class="tab-icon">📢</span>Extras
+    </div>
+    <div class="tab" onclick="switchTab('bgm', this)">
+      <span class="tab-icon">🎵</span>BGM
+    </div>
+  </div>
+
+  <!-- Batting Panel -->
+  <div class="panel active" id="panel-batting">
+    <p class="section-label">Batting Events</p>
+    <div class="sound-grid">
+      <button class="sound-btn btn-batting" onclick="play('1 run.mp3', '1 Run', this)">
+        <span class="btn-icon">1️⃣</span>
+        <span class="btn-label">1 Run</span>
+      </button>
+      <button class="sound-btn btn-batting" onclick="play('2 runs.mp3', '2 Runs', this)">
+        <span class="btn-icon">2️⃣</span>
+        <span class="btn-label">2 Runs</span>
+      </button>
+      <button class="sound-btn btn-batting" onclick="play('4 runs.mp3', '4 Runs 🔥', this)">
+        <span class="btn-icon">4️⃣</span>
+        <span class="btn-label">4 Runs</span>
+      </button>
+      <button class="sound-btn btn-batting" onclick="play('6 runs.mp3', '6 Runs 💥', this)">
+        <span class="btn-icon">6️⃣</span>
+        <span class="btn-label">6 Runs</span>
+      </button>
+      <button class="sound-btn btn-batting" onclick="play('Cheers to batsman on last overs.mp3', 'Last Over Cheers', this)">
+        <span class="btn-icon">🎉</span>
+        <span class="btn-label">Last Over Cheers</span>
+      </button>
+    </div>
+    <button class="stop-btn" onclick="stopSound()">⏹ Stop Sound</button>
+  </div>
+
+  <!-- Bowling Panel -->
+  <div class="panel" id="panel-bowling">
+    <p class="section-label">Bowling Events</p>
+    <div class="sound-grid">
+      <button class="sound-btn btn-bowling" onclick="play('Good Ball.mp3', 'Good Ball', this)">
+        <span class="btn-icon">👌</span>
+        <span class="btn-label">Good Ball</span>
+      </button>
+      <button class="sound-btn btn-bowling" onclick="play('Nice Ball.mp3', 'Nice Ball', this)">
+        <span class="btn-icon">💪</span>
+        <span class="btn-label">Nice Ball</span>
+      </button>
+      <button class="sound-btn btn-bowling" onclick="play('Wicket.mp3', 'Wicket! 🎯', this)">
+        <span class="btn-icon">🎯</span>
+        <span class="btn-label">Wicket!</span>
+      </button>
+      <button class="sound-btn btn-bowling" onclick="play('Wicket-2.mp3', 'Wicket 2! 🎯', this)">
+        <span class="btn-icon">🏆</span>
+        <span class="btn-label">Wicket 2!</span>
+      </button>
+    </div>
+    <button class="stop-btn" onclick="stopSound()">⏹ Stop Sound</button>
+  </div>
+
+  <!-- Extras Panel -->
+  <div class="panel" id="panel-extras">
+    <p class="section-label">Match Events</p>
+    <div class="sound-grid">
+      <button class="sound-btn btn-extras" onclick="play('No Ball.mp3', 'No Ball', this)">
+        <span class="btn-icon">🚫</span>
+        <span class="btn-label">No Ball</span>
+      </button>
+      <button class="sound-btn btn-extras" onclick="play('Wide Ball.mp3', 'Wide Ball', this)">
+        <span class="btn-icon">↔️</span>
+        <span class="btn-label">Wide Ball</span>
+      </button>
+      <button class="sound-btn btn-extras" onclick="play('Over Change.mp3', 'Over Change', this)">
+        <span class="btn-icon">🔄</span>
+        <span class="btn-label">Over Change</span>
+      </button>
+      <button class="sound-btn btn-extras" onclick="play('whistle.mp3', 'Whistle', this)">
+        <span class="btn-icon">📯</span>
+        <span class="btn-label">Whistle</span>
+      </button>
+      <button class="sound-btn btn-extras" onclick="play('whistle-102013.mp3', 'Whistle 2', this)">
+        <span class="btn-icon">🎺</span>
+        <span class="btn-label">Whistle 2</span>
+      </button>
+    </div>
+    <button class="stop-btn" onclick="stopSound()">⏹ Stop Sound</button>
+  </div>
+
+  <!-- BGM Panel -->
+  <div class="panel" id="panel-bgm">
+    <p class="section-label">BGM &amp; Fun Sounds</p>
+    <div class="sound-grid">
+      <button class="sound-btn btn-bgm" onclick="play('animal_bgm.mp3', 'Animal BGM', this)">
+        <span class="btn-icon">🐯</span>
+        <span class="btn-label">Animal BGM</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('vikram.mp3', 'Vikram', this)">
+        <span class="btn-icon">🎬</span>
+        <span class="btn-label">Vikram</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('jailer.mp3', 'Jailer', this)">
+        <span class="btn-icon">🎵</span>
+        <span class="btn-label">Jailer</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('Arjun Reddy.mp3', 'Arjun Reddy', this)">
+        <span class="btn-icon">🎸</span>
+        <span class="btn-label">Arjun Reddy</span>
+      </button>
+
+      <button class="sound-btn btn-bgm" onclick="play('OG-1.mp3', 'OG-1', this)">
+        <span class="btn-icon">🔥</span>
+        <span class="btn-label">OG-1</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('OG-2.mp3', 'OG-2', this)">
+        <span class="btn-icon">⚡</span>
+        <span class="btn-label">OG-2</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('Bhavani.mp3', 'Bhavani', this)">
+        <span class="btn-icon">🎶</span>
+        <span class="btn-label">Bhavani</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('Varadhey.mp3', 'Varadhey', this)">
+        <span class="btn-icon">🎵</span>
+        <span class="btn-label">Varadhey</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('Aathdey.mp3', 'Aathdey', this)">
+        <span class="btn-icon">🕺</span>
+        <span class="btn-label">Aathdey</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('beast.mp3', 'Beast', this)">
+        <span class="btn-icon">🐉</span>
+        <span class="btn-label">Beast</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('Kabali.mp3', 'Kabali', this)">
+        <span class="btn-icon">😎</span>
+        <span class="btn-label">Kabali</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('Paradise.mp3', 'Paradise', this)">
+        <span class="btn-icon">🌟</span>
+        <span class="btn-label">Paradise</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('CSK fans.mp3', 'CSK Fans', this)">
+        <span class="btn-icon">💛</span>
+        <span class="btn-label">CSK Fans</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('Toxic.mp3', 'Toxic', this)">
+        <span class="btn-icon">☠️</span>
+        <span class="btn-label">Toxic</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('Doctor Bgm.mp3', 'Doctor BGM', this)">
+        <span class="btn-icon">🩺</span>
+        <span class="btn-label">Doctor BGM</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('Arasan BGM.mp3', 'Arasan BGM', this)">
+        <span class="btn-icon">👑</span>
+        <span class="btn-label">Arasan BGM</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('Coolie.mp3', 'Coolie', this)">
+        <span class="btn-icon">🚂</span>
+        <span class="btn-label">Coolie</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('Remix.mp3', 'Remix', this)">
+        <span class="btn-icon">🎧</span>
+        <span class="btn-label">Remix</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('Master blaster.mp3', 'Master Blaster', this)">
+        <span class="btn-icon">🏏</span>
+        <span class="btn-label">Master Blaster</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('Kalki Bgm.mp3', 'Kalki BGM', this)">
+        <span class="btn-icon">🌌</span>
+        <span class="btn-label">Kalki BGM</span>
+      </button>
+      <button class="sound-btn btn-bgm" onclick="play('Nee potu vacha.mp3', 'Nee Potu Vacha', this)">
+        <span class="btn-icon">🎤</span>
+        <span class="btn-label">Nee Potu Vacha</span>
+      </button>
+    </div>
+    <button class="stop-btn" onclick="stopSound()">⏹ Stop Sound</button>
+  </div>
+
+  <!-- GIF Overlays -->
+  <img id="four-gif"   class="gif-overlay" src="https://i.gifer.com/4l3d.gif"                              alt="4 runs">
+  <img id="six-gif"    class="gif-overlay" src="https://i.gifer.com/33Hs.gif"                              alt="6 runs">
+  <img id="wicket-gif" class="gif-overlay" src="https://media1.tenor.com/m/LxgSnOOKnjEAAAAd/out-umpire.gif" alt="wicket">
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Audio -->
+  <audio id="player"></audio>
+
+  <script>
+    const player = document.getElementById('player');
+    const nowPlayingText = document.getElementById('now-playing-text');
+    const pulseDot = document.getElementById('pulse-dot');
+    let activeBtn = null;
+    let confettiAnim = null;
+
+    // ── Tab switching ──
+    function switchTab(name, el) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('panel-' + name).classList.add('active');
+    }
+
+    // ── Play sound ──
+    function play(file, label, btn) {
+      player.src = file;
+      player.play();
+
+      nowPlayingText.textContent = label;
+      pulseDot.classList.add('active');
+
+      if (activeBtn) activeBtn.classList.remove('playing');
+      activeBtn = btn;
+      btn.classList.add('playing');
+      setTimeout(() => btn.classList.remove('playing'), 600);
+
+      player.onended = () => {
+        pulseDot.classList.remove('active');
+        nowPlayingText.textContent = '—';
+      };
+
+      const f = file.toLowerCase();
+      if (f.includes('4 run')) {
+        showGif('four-gif');
+        launchConfetti(['#f5a623','#fff','#1a6b3c','#ff4444']);
+      } else if (f.includes('6 run')) {
+        showGif('six-gif');
+        launchConfetti(['#f5a623','#ff4444','#00cfff','#fff','#a855f7']);
+      } else if (f.includes('wicket')) {
+        showGif('wicket-gif');
+        triggerShake();
+      }
+    }
+
+    // ── Stop ──
+    function stopSound() {
+      player.pause();
+      player.currentTime = 0;
+      pulseDot.classList.remove('active');
+      nowPlayingText.textContent = '—';
+    }
+
+    // ── Show GIF ──
+    function showGif(id) {
+      ['four-gif','six-gif','wicket-gif'].forEach(g => {
+        document.getElementById(g).style.display = 'none';
+      });
+      const el = document.getElementById(id);
+      el.style.display = 'block';
+      setTimeout(() => el.style.display = 'none', 3000);
+    }
+
+    // ── Shake + crack ──
+    function triggerShake() {
+      document.body.classList.add('shake');
+      const crack = document.createElement('div');
+      crack.className = 'crack-overlay';
+      document.body.appendChild(crack);
+      setTimeout(() => {
+        document.body.classList.remove('shake');
+        crack.remove();
+      }, 1000);
+    }
+
+    // ── Confetti ──
+    function launchConfetti(colors) {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      if (confettiAnim) cancelAnimationFrame(confettiAnim);
+
+      const pieces = Array.from({ length: 180 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: Math.random() * 10 + 5,
+        h: Math.random() * 6 + 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rot: Math.random() * Math.PI * 2,
+        vx: Math.random() * 4 - 2,
+        vy: Math.random() * 4 + 2,
+        vr: Math.random() * 0.2 - 0.1,
+        alpha: 1,
+      }));
+
+      let frame = 0;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vr;
+          if (frame > 60) p.alpha -= 0.012;
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.alpha);
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        });
+        frame++;
+        if (frame < 140) confettiAnim = requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      draw();
+    }
+  </script>
+</body>
+</html>
